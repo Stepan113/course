@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -11,12 +11,13 @@
     <div class="container">
         <a class="navbar-brand" href="/">CourseRPP</a>
         <div class="navbar-nav">
-            <a class="nav-link" th:href="@{/cards}">Карты</a>
-            <a class="nav-link" th:href="@{/scores}">Счета</a>
-            <a class="nav-link" th:href="@{/cash-withdrawals}">Снятие наличных</a>
-            <a class="nav-link" th:href="@{/money-transfers}">Переводы</a>
-            <a class="nav-link" th:href="@{/applications}">Заявки</a>
-            <a class="nav-link" th:href="@{/replenishments}">Пополнения</a>
+            <a class="nav-link" sec:authorize="hasRole('EXECUTOR')" th:href="@{/cards}">Карты</a>
+            <a class="nav-link" sec:authorize="hasRole('GUARANTOR')" th:href="@{/scores}">Счета</a>
+            <a class="nav-link" sec:authorize="hasRole('GUARANTOR')" th:href="@{/cash-withdrawals}">Снятие наличных</a>
+            <a class="nav-link" sec:authorize="hasRole('GUARANTOR')" th:href="@{/money-transfers}">Переводы</a>
+            <a class="nav-link" sec:authorize="hasRole('EXECUTOR')" th:href="@{/applications}">Заявки</a>
+            <a class="nav-link" sec:authorize="hasRole('EXECUTOR')" th:href="@{/replenishments}">Пополнения</a>
+            <a class="nav-link" th:href="@{/reports}">Отчёты</a>
         </div>
         <form th:action="@{/auth/logout}" method="post" class="ms-auto">
             <button type="submit" class="btn btn-outline-light btn-sm">Выход</button>
@@ -24,8 +25,8 @@
     </div>
 </nav>
 <div class="container mt-4" style="max-width:500px">
-    <h3 class="mb-3">Новая заявка на снятие</h3>
-    <form th:action="@{/applications/save}" th:object="${application}" method="post">
+    <h3 class="mb-3" th:text="${application.id != null ? 'Редактировать заявку' : 'Новая заявка на снятие'}"></h3>
+    <form th:action="${application.id != null ? '/applications/' + application.id + '/update' : '/applications/save'}" th:object="${application}" method="post">
         <div class="mb-3">
             <label for="delay" class="form-label">Задержка (дней)</label>
             <input type="number" id="delay" th:field="*{delay}" class="form-control" min="1" required/>

@@ -11,12 +11,13 @@
     <div class="container">
         <a class="navbar-brand" href="/">CourseRPP</a>
         <div class="navbar-nav">
-            <a class="nav-link" th:href="@{/cards}">Карты</a>
-            <a class="nav-link" th:href="@{/scores}">Счета</a>
-            <a class="nav-link" th:href="@{/cash-withdrawals}">Снятие наличных</a>
-            <a class="nav-link" th:href="@{/money-transfers}">Переводы</a>
-            <a class="nav-link" th:href="@{/applications}">Заявки</a>
-            <a class="nav-link" th:href="@{/replenishments}">Пополнения</a>
+            <a class="nav-link" sec:authorize="hasRole('EXECUTOR')" th:href="@{/cards}">Карты</a>
+            <a class="nav-link" sec:authorize="hasRole('GUARANTOR')" th:href="@{/scores}">Счета</a>
+            <a class="nav-link" sec:authorize="hasRole('GUARANTOR')" th:href="@{/cash-withdrawals}">Снятие наличных</a>
+            <a class="nav-link" sec:authorize="hasRole('GUARANTOR')" th:href="@{/money-transfers}">Переводы</a>
+            <a class="nav-link" sec:authorize="hasRole('EXECUTOR')" th:href="@{/applications}">Заявки</a>
+            <a class="nav-link" sec:authorize="hasRole('EXECUTOR')" th:href="@{/replenishments}">Пополнения</a>
+            <a class="nav-link" th:href="@{/reports}">Отчёты</a>
         </div>
         <form th:action="@{/auth/logout}" method="post" class="ms-auto">
             <button type="submit" class="btn btn-outline-light btn-sm">Выход</button>
@@ -43,6 +44,7 @@
             <td th:text="${card.balance}"></td>
             <td th:text="${card.CVC}"></td>
             <td>
+                <a th:href="@{/cards/{id}/edit(id=${card.id})}" class="btn btn-sm btn-warning me-1">Изменить</a>
                 <a th:href="@{/cards/{id}/delete(id=${card.id})}" class="btn btn-danger btn-sm"
                    onclick="return confirm('Удалить карту?')">Удалить</a>
             </td>

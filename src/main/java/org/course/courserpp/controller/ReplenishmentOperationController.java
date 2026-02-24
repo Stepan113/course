@@ -36,6 +36,19 @@ public class ReplenishmentOperationController {
         return "redirect:/replenishments";
     }
 
+    @GetMapping("/{id}/edit")
+    public String editForm(@PathVariable String id, Model model) {
+        model.addAttribute("replenishment", replenishmentOperationService.findById(id));
+        return "replenishment/form";
+    }
+
+    @PostMapping("/{id}/update")
+    public String update(@PathVariable String id, @ModelAttribute ReplenishmentOperation replenishment) {
+        replenishment.setId(id);
+        replenishmentOperationService.save(replenishment);
+        return "redirect:/replenishments";
+    }
+
     @GetMapping("/{id}/delete")
     public String delete(@PathVariable String id) {
         replenishmentOperationService.delete(id);

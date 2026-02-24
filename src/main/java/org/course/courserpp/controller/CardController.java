@@ -36,6 +36,19 @@ public class CardController {
         return "redirect:/cards";
     }
 
+    @GetMapping("/{id}/edit")
+    public String editForm(@PathVariable String id, Model model) {
+        model.addAttribute("card", cardService.findById(id));
+        return "card/form";
+    }
+
+    @PostMapping("/{id}/update")
+    public String update(@PathVariable String id, @ModelAttribute Card card) {
+        card.setId(id);
+        cardService.save(card);
+        return "redirect:/cards";
+    }
+
     @GetMapping("/{id}/delete")
     public String delete(@PathVariable String id) {
         cardService.delete(id);

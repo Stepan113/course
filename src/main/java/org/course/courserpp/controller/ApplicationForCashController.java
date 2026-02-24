@@ -36,6 +36,19 @@ public class ApplicationForCashController {
         return "redirect:/applications";
     }
 
+    @GetMapping("/{id}/edit")
+    public String editForm(@PathVariable String id, Model model) {
+        model.addAttribute("application", applicationForCashService.findById(id));
+        return "application/form";
+    }
+
+    @PostMapping("/{id}/update")
+    public String update(@PathVariable String id, @ModelAttribute ApplicationForCash application) {
+        application.setId(id);
+        applicationForCashService.save(application);
+        return "redirect:/applications";
+    }
+
     @GetMapping("/{id}/delete")
     public String delete(@PathVariable String id) {
         applicationForCashService.delete(id);

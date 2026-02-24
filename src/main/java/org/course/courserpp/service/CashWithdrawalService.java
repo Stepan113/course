@@ -42,6 +42,14 @@ public class CashWithdrawalService {
         for (String scoreId : scoreIds) {
             Score score = scoreRepository.findById(scoreId)
                     .orElseThrow(() -> new RuntimeException("Счёт не найден: " + scoreId));
+            try {
+                long scoreBalance = Long.parseLong(score.getBalance().trim());
+                if (scoreBalance < cashWithdrawal.getWithdrawalAmount()) {
+                    throw new IllegalStateException("Недостаточно средств на счёте " + score.getNumber() + ": баланс " + scoreBalance + ", требуется " + cashWithdrawal.getWithdrawalAmount());
+                }
+            } catch (NumberFormatException e) {
+                // balance is not numeric, skip check
+            }
             score.getCashWithdrawals().add(cashWithdrawal);
             scoreRepository.save(score);
         }

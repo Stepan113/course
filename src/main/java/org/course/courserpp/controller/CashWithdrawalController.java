@@ -58,6 +58,31 @@ public class CashWithdrawalController {
         return "redirect:/cash-withdrawals";
     }
 
+    @GetMapping("/{id}/edit")
+    public String editForm(@PathVariable String id, Model model) {
+        model.addAttribute("cashWithdrawal", cashWithdrawalService.findById(id));
+        model.addAttribute("scores", scoreService.findAll());
+        model.addAttribute("applications", applicationForCashService.findAll());
+        return "cash-withdrawal/form";
+    }
+
+    @PostMapping("/{id}/update")
+    public String update(@PathVariable String id,
+                         @RequestParam Long withdrawalAmount,
+                         @RequestParam(required = false) List<String> scoreIds,
+                         @RequestParam(required = false) String applicationId) {
+        CashWithdrawal cw = cashWithdrawalService.findById(id);
+        cw.setWithdrawalAmount(withdrawalAmount);
+        cashWithdrawalService.save(cw);
+        if (applicationId != null && !applicationId.isBlank()) {
+            cashWithdrawalService.linkToApplication(id, applicationId);
+        }
+        if (scoreIds != null && !scoreIds.isEmpty()) {
+            cashWithdrawalService.linkToScores(id, scoreIds);
+        }
+        return "redirect:/cash-withdrawals";
+    }
+
     @GetMapping("/{id}/delete")
     public String delete(@PathVariable String id) {
         cashWithdrawalService.delete(id);

@@ -22,11 +22,14 @@ public class SecurityConfig {
         http
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/auth/**", "/css/**", "/js/**").permitAll()
+                .requestMatchers("/scores/**", "/cash-withdrawals/**", "/money-transfers/**").hasRole("GUARANTOR")
+                .requestMatchers("/cards/**", "/applications/**", "/replenishments/**").hasRole("EXECUTOR")
+                .requestMatchers("/reports/**").authenticated()
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
                 .loginPage("/auth/login")
-                .defaultSuccessUrl("/cards", true)
+                .defaultSuccessUrl("/reports", true)
                 .permitAll()
             )
             .logout(logout -> logout

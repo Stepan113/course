@@ -49,6 +49,26 @@ public class MoneyTransferController {
         return "redirect:/money-transfers";
     }
 
+    @GetMapping("/{id}/edit")
+    public String editForm(@PathVariable String id, Model model) {
+        model.addAttribute("moneyTransfer", moneyTransferService.findById(id));
+        model.addAttribute("scores", scoreService.findAll());
+        return "money-transfer/form";
+    }
+
+    @PostMapping("/{id}/update")
+    public String update(@PathVariable String id,
+                         @RequestParam Long sum,
+                         @RequestParam(required = false) List<String> scoreIds) {
+        MoneyTransfer mt = moneyTransferService.findById(id);
+        mt.setSum(sum);
+        moneyTransferService.save(mt);
+        if (scoreIds != null && !scoreIds.isEmpty()) {
+            moneyTransferService.linkToScores(id, scoreIds);
+        }
+        return "redirect:/money-transfers";
+    }
+
     @GetMapping("/{id}/delete")
     public String delete(@PathVariable String id) {
         moneyTransferService.delete(id);

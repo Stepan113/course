@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Отчёты — CourseRPP</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"/>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="/reports">CourseRPP</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav me-auto">
+                <li class="nav-item" sec:authorize="hasRole('EXECUTOR')"><a class="nav-link" th:href="@{/cards}">Карты</a></li>
+                <li class="nav-item" sec:authorize="hasRole('GUARANTOR')"><a class="nav-link" th:href="@{/scores}">Счета</a></li>
+                <li class="nav-item" sec:authorize="hasRole('GUARANTOR')"><a class="nav-link" th:href="@{/cash-withdrawals}">Снятие наличных</a></li>
+                <li class="nav-item" sec:authorize="hasRole('GUARANTOR')"><a class="nav-link" th:href="@{/money-transfers}">Переводы</a></li>
+                <li class="nav-item" sec:authorize="hasRole('EXECUTOR')"><a class="nav-link" th:href="@{/applications}">Заявки</a></li>
+                <li class="nav-item" sec:authorize="hasRole('EXECUTOR')"><a class="nav-link" th:href="@{/replenishments}">Пополнения</a></li>
+                <li class="nav-item"><a class="nav-link active" th:href="@{/reports}">Отчёты</a></li>
+            </ul>
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <form th:action="@{/auth/logout}" method="post" class="d-inline">
+                        <button type="submit" class="btn btn-outline-light btn-sm">Выход</button>
+                    </form>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container mt-4">
+    <h2 class="mb-4">Отчёты</h2>
+
+    <!-- Excel / Word Report -->
+    <div class="card mb-4">
+        <div class="card-header bg-success text-white">Список снятий по счетам (Excel / Word)</div>
+        <div class="card-body">
+            <form th:action="@{/reports/download-excel}" method="post" class="mb-3">
+                <div class="mb-3">
+                    <label class="form-label">Выберите счета</label>
+                    <select name="scoreIds" class="form-select" multiple size="5">
+                        <option th:each="score : ${scores}" th:value="${score.id}"
+                                th:text="${score.number + ' (баланс: ' + score.balance + ')'}"></option>
+                    </select>
+                    <div class="form-text">Ctrl для выбора нескольких</div>
+                </div>
+                <button type="submit" class="btn btn-success me-2">Скачать Excel</button>
+            </form>
+            <form th:action="@{/reports/download-word}" method="post">
+                <div class="mb-3">
+                    <label class="form-label">Выберите счета</label>
+                    <select name="scoreIds" class="form-select" multiple size="5">
+                        <option th:each="score : ${scores}" th:value="${score.id}"
+                                th:text="${score.number + ' (баланс: ' + score.balance + ')'}"></option>
+                    </select>
+                    <div class="form-text">Ctrl для выбора нескольких</div>
+                </div>
+                <button type="submit" class="btn btn-primary">Скачать Word</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- PDF Report -->
+    <div class="card mb-4">
+        <div class="card-header bg-danger text-white">PDF-отчёт по счетам за период</div>
+        <div class="card-body">
+            <form th:action="@{/reports/download-pdf}" method="post">
+                <div class="mb-3">
+                    <label class="form-label">Выберите счета</label>
+                    <select name="scoreIds" class="form-select" multiple size="5">
+                        <option th:each="score : ${scores}" th:value="${score.id}"
+                                th:text="${score.number + ' (баланс: ' + score.balance + ')'}"></option>
+                    </select>
+                    <div class="form-text">Ctrl для выбора нескольких</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">С даты</label>
+                        <input type="date" name="from" class="form-control"/>
+                    </div>
+                    <div class="col">
+                        <label class="form-label">По дату</label>
+                        <input type="date" name="to" class="form-control"/>
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-danger">Скачать PDF</button>
+            </form>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

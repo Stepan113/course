@@ -36,6 +36,19 @@ public class ScoreController {
         return "redirect:/scores";
     }
 
+    @GetMapping("/{id}/edit")
+    public String editForm(@PathVariable String id, Model model) {
+        model.addAttribute("score", scoreService.findById(id));
+        return "score/form";
+    }
+
+    @PostMapping("/{id}/update")
+    public String update(@PathVariable String id, @ModelAttribute Score score) {
+        score.setId(id);
+        scoreService.save(score);
+        return "redirect:/scores";
+    }
+
     @GetMapping("/{id}/delete")
     public String delete(@PathVariable String id) {
         scoreService.delete(id);

@@ -15,12 +15,13 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav me-auto">
-                <li class="nav-item"><a class="nav-link" th:href="@{/cards}">Карты</a></li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/scores}">Счета</a></li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/cash-withdrawals}">Снятие наличных</a></li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/money-transfers}">Переводы</a></li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/applications}">Заявки</a></li>
-                <li class="nav-item"><a class="nav-link" th:href="@{/replenishments}">Пополнения</a></li>
+                <li class="nav-item" sec:authorize="hasRole('EXECUTOR')"><a class="nav-link" th:href="@{/cards}">Карты</a></li>
+                <li class="nav-item" sec:authorize="hasRole('GUARANTOR')"><a class="nav-link" th:href="@{/scores}">Счета</a></li>
+                <li class="nav-item" sec:authorize="hasRole('GUARANTOR')"><a class="nav-link" th:href="@{/cash-withdrawals}">Снятие наличных</a></li>
+                <li class="nav-item" sec:authorize="hasRole('GUARANTOR')"><a class="nav-link" th:href="@{/money-transfers}">Переводы</a></li>
+                <li class="nav-item" sec:authorize="hasRole('EXECUTOR')"><a class="nav-link" th:href="@{/applications}">Заявки</a></li>
+                <li class="nav-item" sec:authorize="hasRole('EXECUTOR')"><a class="nav-link" th:href="@{/replenishments}">Пополнения</a></li>
+                <li class="nav-item"><a class="nav-link" th:href="@{/reports}">Отчёты</a></li>
             </ul>
             <ul class="navbar-nav ms-auto" sec:authorize="isAuthenticated()">
                 <li class="nav-item">

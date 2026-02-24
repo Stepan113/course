@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1"/>
@@ -11,12 +11,13 @@
     <div class="container">
         <a class="navbar-brand" href="/">CourseRPP</a>
         <div class="navbar-nav">
-            <a class="nav-link" th:href="@{/cards}">Карты</a>
-            <a class="nav-link" th:href="@{/scores}">Счета</a>
-            <a class="nav-link" th:href="@{/cash-withdrawals}">Снятие наличных</a>
-            <a class="nav-link" th:href="@{/money-transfers}">Переводы</a>
-            <a class="nav-link" th:href="@{/applications}">Заявки</a>
-            <a class="nav-link" th:href="@{/replenishments}">Пополнения</a>
+            <a class="nav-link" sec:authorize="hasRole('EXECUTOR')" th:href="@{/cards}">Карты</a>
+            <a class="nav-link" sec:authorize="hasRole('GUARANTOR')" th:href="@{/scores}">Счета</a>
+            <a class="nav-link" sec:authorize="hasRole('GUARANTOR')" th:href="@{/cash-withdrawals}">Снятие наличных</a>
+            <a class="nav-link" sec:authorize="hasRole('GUARANTOR')" th:href="@{/money-transfers}">Переводы</a>
+            <a class="nav-link" sec:authorize="hasRole('EXECUTOR')" th:href="@{/applications}">Заявки</a>
+            <a class="nav-link" sec:authorize="hasRole('EXECUTOR')" th:href="@{/replenishments}">Пополнения</a>
+            <a class="nav-link" th:href="@{/reports}">Отчёты</a>
         </div>
         <form th:action="@{/auth/logout}" method="post" class="ms-auto">
             <button type="submit" class="btn btn-outline-light btn-sm">Выход</button>
@@ -41,6 +42,7 @@
             <td th:text="${mt.sum}"></td>
             <td th:text="${mt.createdAt}"></td>
             <td>
+                <a th:href="@{/money-transfers/{id}/edit(id=${mt.id})}" class="btn btn-sm btn-warning me-1">Изменить</a>
                 <a th:href="@{/money-transfers/{id}/delete(id=${mt.id})}" class="btn btn-danger btn-sm"
                    onclick="return confirm('Удалить?')">Удалить</a>
             </td>
