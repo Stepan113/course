@@ -36,6 +36,16 @@
 <div class="container mt-4">
     <h2 class="mb-4">Отчёты</h2>
 
+    <!-- Flash messages -->
+    <div th:if="${successMessage}" class="alert alert-success alert-dismissible fade show" role="alert">
+        <span th:text="${successMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+    <div th:if="${errorMessage}" class="alert alert-danger alert-dismissible fade show" role="alert">
+        <span th:text="${errorMessage}"></span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+
     <!-- Excel / Word Report -->
     <div class="card mb-4">
         <div class="card-header bg-success text-white">Список снятий по счетам (Excel / Word)</div>
@@ -89,6 +99,38 @@
                     </div>
                 </div>
                 <button type="submit" class="btn btn-danger">Скачать PDF</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Send PDF to Email -->
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">Отправить PDF-отчёт на почту</div>
+        <div class="card-body">
+            <form th:action="@{/reports/send-pdf}" method="post">
+                <div class="mb-3">
+                    <label class="form-label">Выберите счета</label>
+                    <select name="scoreIds" class="form-select" multiple size="5">
+                        <option th:each="score : ${scores}" th:value="${score.id}"
+                                th:text="${score.number + ' (баланс: ' + score.balance + ')'}"></option>
+                    </select>
+                    <div class="form-text">Ctrl для выбора нескольких</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">С даты</label>
+                        <input type="date" name="from" class="form-control"/>
+                    </div>
+                    <div class="col">
+                        <label class="form-label">По дату</label>
+                        <input type="date" name="to" class="form-control"/>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Адрес электронной почты</label>
+                    <input type="email" name="email" class="form-control" placeholder="example@mail.ru" required/>
+                </div>
+                <button type="submit" class="btn btn-primary">Отправить на почту</button>
             </form>
         </div>
     </div>
