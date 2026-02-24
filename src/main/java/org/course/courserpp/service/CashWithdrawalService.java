@@ -1,6 +1,7 @@
 package org.course.courserpp.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.course.courserpp.model.ApplicationForCash;
 import org.course.courserpp.model.CashWithdrawal;
 import org.course.courserpp.model.Score;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CashWithdrawalService {
@@ -48,7 +50,7 @@ public class CashWithdrawalService {
                     throw new IllegalStateException("Недостаточно средств на счёте " + score.getNumber() + ": баланс " + scoreBalance + ", требуется " + cashWithdrawal.getWithdrawalAmount());
                 }
             } catch (NumberFormatException e) {
-                // balance is not numeric, skip check
+                log.warn("Не удалось проверить баланс счёта {}: значение '{}' не является числом", score.getNumber(), score.getBalance());
             }
             score.getCashWithdrawals().add(cashWithdrawal);
             scoreRepository.save(score);

@@ -9,6 +9,7 @@ import com.lowagie.text.pdf.PdfPCell;
 import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -30,6 +31,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ReportService {
@@ -105,10 +107,31 @@ public class ReportService {
         document.open();
 
         BaseFont baseFont;
-        try {
-            baseFont = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
-        } catch (Exception e) {
-            baseFont = BaseFont.createFont();
+        // Try Cyrillic-capable fonts from common OS locations, then fall back to standard font
+        String[] cyrillicFontPaths = {
+            "/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf",           // Linux (Debian/Ubuntu)
+            "/usr/share/fonts/dejavu/DejaVuSans.ttf",                    // Linux (RHEL/Fedora)
+            "/Library/Fonts/Arial Unicode MS.ttf",                       // macOS
+            "C:/Windows/Fonts/arial.ttf"                                  // Windows
+        };
+        BaseFont candidateFont = null;
+        for (String path : cyrillicFontPaths) {
+            try {
+                candidateFont = BaseFont.createFont(path, BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+                break;
+            } catch (Exception ignored) {
+                // try next path
+            }
+        }
+        if (candidateFont != null) {
+            baseFont = candidateFont;
+        } else {
+            log.warn("No Cyrillic-capable font found; PDF may display placeholder characters for Russian text");
+            try {
+                baseFont = BaseFont.createFont(BaseFont.HELVETICA, BaseFont.CP1252, BaseFont.NOT_EMBEDDED);
+            } catch (Exception ex) {
+                baseFont = BaseFont.createFont();
+            }
         }
         com.lowagie.text.Font titleFont = new com.lowagie.text.Font(baseFont, 16, com.lowagie.text.Font.BOLD);
         com.lowagie.text.Font normalFont = new com.lowagie.text.Font(baseFont, 12, com.lowagie.text.Font.NORMAL);
