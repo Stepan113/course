@@ -12,3 +12,15 @@ spring:
     properties:
       hibernate:
         show_sql: true
+  mail:
+    host: smtp.yandex.ru
+    port: 587
+    username: ${MAIL_USERNAME:your-email@yandex.ru}
+    password: ${MAIL_PASSWORD:your-app-password}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
