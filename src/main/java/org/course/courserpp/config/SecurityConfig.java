@@ -26,7 +26,7 @@ public class SecurityConfig {
             )
             .formLogin(form -> form
                 .loginPage("/auth/login")
-                .defaultSuccessUrl("/auth/login?success", true)
+                .defaultSuccessUrl("/cards", true)
                 .permitAll()
             )
             .logout(logout -> logout
