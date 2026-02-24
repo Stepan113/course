@@ -85,4 +85,23 @@ public class ReportController {
         }
         return "redirect:/reports";
     }
+
+    @PostMapping("/send-pdf-email")
+    public String sendPdfEmail(
+            @RequestParam(required = false) List<String> scoreIds,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,
+            @RequestParam String recipientEmail,
+            RedirectAttributes redirectAttributes) {
+        try {
+            if (scoreIds == null) scoreIds = List.of();
+            byte[] pdfData = reportService.generatePdf(scoreIds, from, to);
+            emailService.sendPdfReport(recipientEmail, pdfData, "report.pdf");
+            redirectAttributes.addFlashAttribute("emailSuccess", "PDF-отчёт успешно отправлен на адрес " + recipientEmail);
+        } catch (Exception e) {
+            log.error("Ошибка при отправке PDF-отчёта на адрес {}: {}", recipientEmail, e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("emailError", "Ошибка при отправке письма. Проверьте настройки почты и попробуйте снова.");
+        }
+        return "redirect:/reports";
+    }
 }
