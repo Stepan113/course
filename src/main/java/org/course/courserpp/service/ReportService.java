@@ -21,6 +21,7 @@ import org.apache.poi.xwpf.usermodel.XWPFTable;
 import org.apache.poi.xwpf.usermodel.XWPFTableRow;
 import org.course.courserpp.model.CashWithdrawal;
 import org.course.courserpp.model.MoneyTransfer;
+import org.course.courserpp.model.ReportRow;
 import org.course.courserpp.model.Score;
 import org.course.courserpp.repository.ScoreRepository;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,7 @@ import org.springframework.stereotype.Service;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -185,5 +187,36 @@ public class ReportService {
 
         document.close();
         return out.toByteArray();
+    }
+
+    public List<ReportRow> generateReportRows(Date from, Date to) {
+        List<Score> scores = scoreRepository.findAll();
+        List<ReportRow> rows = new ArrayList<>();
+        for (Score score : scores) {
+            for (CashWithdrawal cw : score.getCashWithdrawals()) {
+                if (from != null && cw.getCreatedAt() != null && cw.getCreatedAt().before(from)) continue;
+                if (to != null && cw.getCreatedAt() != null && cw.getCreatedAt().after(to)) continue;
+                ReportRow row = new ReportRow();
+                row.setAccountNumber(score.getNumber());
+                row.setAccountBalance(score.getBalance());
+                row.setType("Снятие наличных");
+                row.setAmount(cw.getWithdrawalAmount());
+                row.setDate(cw.getCreatedAt());
+                row.setApplicationId(cw.getApplicationForCash() != null ? cw.getApplicationForCash().getId() : null);
+                rows.add(row);
+            }
+            for (MoneyTransfer mt : score.getMoneyTransfers()) {
+                if (from != null && mt.getCreatedAt() != null && mt.getCreatedAt().before(from)) continue;
+                if (to != null && mt.getCreatedAt() != null && mt.getCreatedAt().after(to)) continue;
+                ReportRow row = new ReportRow();
+                row.setAccountNumber(score.getNumber());
+                row.setAccountBalance(score.getBalance());
+                row.setType("Перевод");
+                row.setAmount(mt.getSum());
+                row.setDate(mt.getCreatedAt());
+                rows.add(row);
+            }
+        }
+        return rows;
     }
 }

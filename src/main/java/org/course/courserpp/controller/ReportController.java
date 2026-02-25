@@ -2,6 +2,7 @@ package org.course.courserpp.controller;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.course.courserpp.model.Score;
 import org.course.courserpp.service.EmailService;
 import org.course.courserpp.service.ReportService;
 import org.course.courserpp.service.ScoreService;
@@ -101,6 +102,42 @@ public class ReportController {
         } catch (Exception e) {
             log.error("Ошибка при отправке PDF-отчёта на адрес {}: {}", recipientEmail, e.getMessage(), e);
             redirectAttributes.addFlashAttribute("emailError", "Ошибка при отправке письма. Проверьте настройки почты и попробуйте снова.");
+        }
+        return "redirect:/reports";
+    }
+
+    @PostMapping("/preview")
+    public String previewReport(
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,
+            @RequestParam(required = false) String email,
+            Model model) {
+        model.addAttribute("scores", scoreService.findAll());
+        model.addAttribute("reportRows", reportService.generateReportRows(from, to));
+        model.addAttribute("reportFrom", from);
+        model.addAttribute("reportTo", to);
+        model.addAttribute("reportEmail", email);
+        return "report/index";
+    }
+
+    @PostMapping("/send-pdf-all")
+    public String sendPdfAll(
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date from,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") Date to,
+            @RequestParam(required = false) String email,
+            RedirectAttributes redirectAttributes) {
+        if (email == null || email.isBlank()) {
+            redirectAttributes.addFlashAttribute("errorMessage", "Укажите адрес электронной почты для отправки отчёта.");
+            return "redirect:/reports";
+        }
+        try {
+            List<String> allScoreIds = scoreService.findAll().stream().map(Score::getId).toList();
+            byte[] pdfData = reportService.generatePdf(allScoreIds, from, to);
+            emailService.sendPdfReport(email, pdfData, "report.pdf");
+            redirectAttributes.addFlashAttribute("successMessage", "PDF-отчёт по всем счетам успешно отправлен на адрес: " + email);
+        } catch (Exception e) {
+            log.error("Ошибка при отправке PDF-отчёта по всем счетам на адрес {}: {}", email, e.getMessage(), e);
+            redirectAttributes.addFlashAttribute("errorMessage", "Ошибка при отправке отчёта. Проверьте настройки почты и попробуйте снова.");
         }
         return "redirect:/reports";
     }

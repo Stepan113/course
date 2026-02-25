@@ -134,6 +134,65 @@
             </form>
         </div>
     </div>
+
+    <!-- Unified PDF Report (Show as table + Send to email) -->
+    <div class="card mb-4">
+        <div class="card-header bg-dark text-white">Отчёт по всем счетам — просмотр и отправка</div>
+        <div class="card-body">
+            <form th:action="@{/reports/preview}" method="post">
+                <div class="row mb-3">
+                    <div class="col">
+                        <label class="form-label">С даты</label>
+                        <input type="date" name="from" class="form-control"
+                               th:value="${reportFrom != null ? #dates.format(reportFrom, 'yyyy-MM-dd') : ''}"/>
+                    </div>
+                    <div class="col">
+                        <label class="form-label">По дату</label>
+                        <input type="date" name="to" class="form-control"
+                               th:value="${reportTo != null ? #dates.format(reportTo, 'yyyy-MM-dd') : ''}"/>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">E-mail для отправки</label>
+                    <input type="email" name="email" class="form-control" placeholder="example@mail.ru"
+                           th:value="${reportEmail}"/>
+                    <div class="form-text">Заполните только если хотите отправить отчёт на почту</div>
+                </div>
+                <button type="submit" class="btn btn-secondary me-2">Показать отчёт</button>
+                <button type="submit" formaction="/reports/send-pdf-all" class="btn btn-primary">Отправить на почту</button>
+            </form>
+
+            <!-- Report table shown after preview -->
+            <div th:if="${reportRows != null}" class="mt-4">
+                <h5 class="mb-3">Результаты отчёта</h5>
+                <div th:if="${#lists.isEmpty(reportRows)}" class="text-muted">
+                    Нет данных за указанный период.
+                </div>
+                <table th:if="${not #lists.isEmpty(reportRows)}" class="table table-striped table-bordered">
+                    <thead class="table-dark">
+                    <tr>
+                        <th>Счёт</th>
+                        <th>Баланс</th>
+                        <th>Тип операции</th>
+                        <th>Сумма</th>
+                        <th>Дата</th>
+                        <th>Заявка</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="row : ${reportRows}">
+                        <td th:text="${row.accountNumber}"></td>
+                        <td th:text="${row.accountBalance}"></td>
+                        <td th:text="${row.type}"></td>
+                        <td th:text="${row.amount}"></td>
+                        <td th:text="${row.date != null ? #dates.format(row.date, 'dd.MM.yyyy') : '—'}"></td>
+                        <td th:text="${row.applicationId != null ? row.applicationId : '—'}"></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
